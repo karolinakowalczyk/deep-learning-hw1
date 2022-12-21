@@ -50,58 +50,19 @@ class LinearModel(object):
 class Perceptron(LinearModel):
 
     def update_weight(self, x_i, y_i, **kwargs):
-        # print(self.W.ndim)
-        # print("***")
-        # t = torch.empty(3, 4, 5)
-        # print(t.size(dim=1))
-        #print(x_i.size())
-        #print(y_i)
-        # print("********")
-        # print(self.W)
-        # num_features = np.shape(x_i)
-        #print(num_features)
-        # print('perceptron func')
-        # print(num_features[0])
-        #current_weight = np.zeros(num_features[0])
-
         """
         x_i (n_features): a single training example
         y_i (scalar): the gold label for that example
         other arguments are ignored
         """
-        # Q1.1a
-        # mistakes = 0
-        # for x, y in zip(inputs, labels):
 
-            # Sign function.
-        #print(current_weight)
-        # print(x_i)
-        # print("#####")
-        # print(y_i)
-        #print(self.W.dot(x_i))
-        #y_hat = 1 if self.W.dot(x_i) >= 0 else -1
-        #y_hat = 1 if sum(self.W.dot(x_i)) >= 0 else -1
-        #weight = np.squeeze(np.asarray((self.W.flatten())/100))
-        #current_x = torch.flatten(x_i)
-        #current_x =  np.squeeze(np.asarray(x_i.flatten()))
-        #print(current_x)
-
-        #never under 0?
-        if sum(self.W.dot(x_i)) < 0:
-            print(sum(self.W.dot(x_i)))
-
-        y_hat = 1 if sum(self.W.dot(x_i)) >= 0 else -1
-        # there's y_hat == y_i and y_hat != y_i
-        # if y_hat == y_i:
-        #     print(y_i)
+        # y_hat = 1 if sum(self.W.dot(x_i)) >= 0 else -1
+        sign = lambda x: 1 if x >= 0 else -1
+        y_hat = map(sign, self.W.dot(x_i))
         if y_hat != y_i:
-            #mistakes += 1
-            # Perceptron update.
-            # w += eta * (y - y_hat) * x
             self.W += (y_i * x_i)
 
         return self.W
-        #raise NotImplementedError
 
 
 class LogisticRegression(LinearModel):

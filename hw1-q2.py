@@ -27,10 +27,13 @@ class LogisticRegression(nn.Module):
         https://pytorch.org/docs/stable/nn.html
         """
         super().__init__()
+        self.linear = torch.nn.Linear(n_features, n_classes, bias=True)
         # In a pytorch module, the declarations of layers needs to come after
         # the super __init__ line, otherwise the magic doesn't work.
 
     def forward(self, x, **kwargs):
+        y_pred = self.linear(x)
+        return y_pred
         """
         x (batch_size x n_features): a batch of training examples
 
@@ -44,7 +47,6 @@ class LogisticRegression(nn.Module):
         forward pass -- this is enough for it to figure out how to do the
         backward pass.
         """
-        raise NotImplementedError
 
 
 # Q2.2
@@ -79,6 +81,12 @@ class FeedforwardNetwork(nn.Module):
 
 
 def train_batch(X, y, model, optimizer, criterion, **kwargs):
+    optimizer.zero_grad()
+    pred_y = model(X)
+    loss = criterion(pred_y, y)
+    loss.backward()
+    optimizer.step()
+    return loss.item()
     """
     X (n_examples x n_features)
     y (n_examples): gold labels
@@ -96,7 +104,6 @@ def train_batch(X, y, model, optimizer, criterion, **kwargs):
     This function should return the loss (tip: call loss.item()) to get the
     loss as a numerical value that is not part of the computation graph.
     """
-    raise NotImplementedError
 
 
 def predict(model, X):
@@ -211,7 +218,6 @@ def main():
         config = "{}-{}".format(opt.learning_rate, opt.optimizer)
     else:
         config = "{}-{}-{}-{}-{}-{}-{}".format(opt.learning_rate, opt.hidden_size, opt.layers, opt.dropout, opt.activation, opt.optimizer, opt.batch_size)
-
     plot(epochs, train_mean_losses, ylabel='Loss', name='{}-training-loss-{}'.format(opt.model, config))
     plot(epochs, valid_accs, ylabel='Accuracy', name='{}-validation-accuracy-{}'.format(opt.model, config))
 
