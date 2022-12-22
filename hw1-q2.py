@@ -71,21 +71,14 @@ class FeedforwardNetwork(nn.Module):
         self.hidden_size = hidden_size
         self.layers_list = nn.ModuleList()  # then loop??
         self.layers = layers
-        # PRINTS
-        # print(layers)
 
-        # for l in range(layers):
-        #     torch.nn.Linear(self.n_features, self.hidden_size)
         for l in range(layers):
             self.layers_list.append(torch.nn.Linear(self.n_features, self.hidden_size))
-            # current_size = hdim
-        # self.fc1 = torch.nn.Linear(self.n_features, self.hidden_size)
         if activation_type == 'tanh':
             self.activation_type = torch.nn.Tanh()
         else:
             self.activation_type = torch.nn.ReLU()
 
-        # self.fc2 = torch.nn.Linear(self.hidden_size, n_classes)
         self.layers_list.append(nn.Linear(self.hidden_size, n_classes))
 
         self.dropout = nn.Dropout(dropout)
@@ -98,16 +91,9 @@ class FeedforwardNetwork(nn.Module):
         the output logits from x. This will include using various hidden
         layers, pointwise nonlinear functions, and dropout.
         """
-        #PRINTS
-        #print(x.batch_size)
-        #print(x[0])
         for lay in self.layers_list[:-1]:
             x = self.activation_type(lay(self.dropout(x)))
         output = self.activation_type(self.layers_list[-1](self.dropout(x)))
-        # hidden = self.fc1(self.dropout(x))
-        # act_func = self.activation_type(hidden)
-        # output = self.fc2(self.dropout(act_func))
-        # output = self.activation_type(output)
         return output
 
 
@@ -173,7 +159,7 @@ def main():
     parser.add_argument('-epochs', default=20, type=int,
                         help="""Number of epochs to train for. You should not
                         need to change this value for your plots.""")
-    parser.add_argument('-batch_size', default=1, type=int,
+    parser.add_argument('-batch_size', default=16, type=int,
                         help="Size of training batch.")
     parser.add_argument('-learning_rate', type=float, default=0.01)
     parser.add_argument('-l2_decay', type=float, default=0)
