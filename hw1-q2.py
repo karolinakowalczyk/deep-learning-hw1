@@ -53,7 +53,7 @@ class LogisticRegression(nn.Module):
 class FeedforwardNetwork(nn.Module):
     def __init__(
             self, n_classes, n_features, hidden_size, layers,
-            activation_type, dropout, **kwargs):
+            activation_type, dropout, layers_list, **kwargs):
         """
         n_classes (int)
         n_features (int)
@@ -72,8 +72,10 @@ class FeedforwardNetwork(nn.Module):
         self.layers_list = nn.ModuleList()  # then loop??
         self.layers = layers
 
-        for l in range(layers):
-            self.layers_list.append(torch.nn.Linear(self.n_features, self.hidden_size))
+        self.layers_list.append(torch.nn.Linear(self.n_features, self.hidden_size))
+        if layers > 1:
+            for l in range(layers-1):
+                self.layers_list.append(torch.nn.Linear(self.hidden_size, self.hidden_size))
         if activation_type == 'tanh':
             self.activation_type = torch.nn.Tanh()
         else:
@@ -164,7 +166,7 @@ def main():
     parser.add_argument('-learning_rate', type=float, default=0.01)
     parser.add_argument('-l2_decay', type=float, default=0)
     parser.add_argument('-hidden_size', type=int, default=100)
-    parser.add_argument('-layers', type=int, default=1)
+    parser.add_argument('-layers', type=int, default=3)
     parser.add_argument('-dropout', type=float, default=0.3)
     parser.add_argument('-activation',
                         choices=['tanh', 'relu'], default='relu')
@@ -189,14 +191,14 @@ def main():
     if opt.model == 'logistic_regression':
         model = LogisticRegression(n_classes, n_feats)
     else:
-        print('feed-forward model')
         model = FeedforwardNetwork(
             n_classes,
             n_feats,
             opt.hidden_size,
             opt.layers,
             opt.activation,
-            opt.dropout
+            opt.dropout,
+            None
         )
 
     # get an optimizer
