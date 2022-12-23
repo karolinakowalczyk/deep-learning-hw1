@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 # Deep Learning Homework 1
-import torch
 
 import argparse
 import random
@@ -48,32 +47,42 @@ class LinearModel(object):
 
 
 class Perceptron(LinearModel):
-
     def update_weight(self, x_i, y_i, **kwargs):
         """
         x_i (n_features): a single training example
         y_i (scalar): the gold label for that example
         other arguments are ignored
         """
-
-        # y_hat = 1 if sum(self.W.dot(x_i)) >= 0 else -1
-        sign = lambda x: 1 if x >= 0 else -1
-        y_hat = map(sign, self.W.dot(x_i))
+        y_hat = self.predict(x_i)
         if y_hat != y_i:
-            self.W += (y_i * x_i)
-
-        return self.W
+            self.W[y_i, :] += x_i
+            self.W[y_hat, :] -= x_i
+        # print("Mistakes: %d" % mistakes)
+        # Q1.1a
+        # raise NotImplementedError
 
 
 class LogisticRegression(LinearModel):
+
     def update_weight(self, x_i, y_i, learning_rate=0.001):
         """
         x_i (n_features): a single training example
         y_i: the gold label for that example
         learning_rate (float): keep it at the default value for your plots
         """
-        # Q1.1b
-        raise NotImplementedError
+
+        # raise NotImplementedError
+
+        # Label scores according to the model (num_labels x 1).
+        label_scores = self.W.dot(x_i)[:, None]
+        # One-hot vector with the true label (num_labels x 1).
+        y_one_hot = np.zeros((np.size(self.W, 0), 1))
+        y_one_hot[y_i] = 1
+        # Softmax function.
+        # This gives the label probabilities according to the model (num_labels x 1).
+        label_probabilities = np.exp(label_scores) / np.sum(np.exp(label_scores))
+        # SGD update. W is num_labels x num_features.
+        self.W += learning_rate * (y_one_hot - label_probabilities) * x_i[None, :]
 
 
 class MLP(object):
@@ -147,9 +156,7 @@ def main():
 
     # initialize the model
     if opt.model == 'perceptron':
-        print("start perceptron")
         model = Perceptron(n_classes, n_feats)
-        print("end perceptron")
     elif opt.model == 'logistic_regression':
         model = LogisticRegression(n_classes, n_feats)
     else:
